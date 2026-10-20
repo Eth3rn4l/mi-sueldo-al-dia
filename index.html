@@ -1,0 +1,309 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Mi Sueldo al Día</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: columna única tipo app móvil; resumen arriba, categorías, luego registro de gastos */
+:root{
+  --bg:#f3f6f5; --surface:#ffffff; --ink:#15302e; --muted:#5d716e; --line:#d8e2df;
+  --accent:#1d6b66; --accent-soft:#dcefeb; --save:#2f7d3a; --warn:#b7791f; --bad:#b33a2e; --sim:#6a5acd;
+  --f-display:"Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --f-body:"IBM Plex Sans", system-ui, sans-serif;
+  --f-num:"IBM Plex Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1716; --surface:#172221; --ink:#e3eeeb; --muted:#93a7a3; --line:#2a3a38;
+  --accent:#5cc2b8; --accent-soft:#1d3532; --save:#6cc47a; --warn:#e0a84a; --bad:#ef7a6c; --sim:#a99cf5; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1716; --surface:#172221; --ink:#e3eeeb; --muted:#93a7a3; --line:#2a3a38;
+  --accent:#5cc2b8; --accent-soft:#1d3532; --save:#6cc47a; --warn:#e0a84a; --bad:#ef7a6c; --sim:#a99cf5; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:640px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;display:flex;flex-direction:column;gap:18px}
+h1{font-family:var(--f-display);font-size:1.7rem;margin:0;letter-spacing:-.01em;text-wrap:balance}
+h2{font-family:var(--f-display);font-size:1.15rem;margin:0 0 10px}
+.sub{color:var(--muted);margin:2px 0 0;font-size:.9rem}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+section{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px}
+.hero{background:var(--accent);color:#fff;border:none}
+.hero .lbl{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;opacity:.85}
+.hero .big{font-family:var(--f-num);font-size:2rem;line-height:1.1;margin:4px 0 10px}
+.hero-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;font-size:.82rem}
+.split{position:relative;overflow:visible!important}
+.split .mark{position:absolute;top:-4px;bottom:-4px;width:2px;background:#ffd166;margin-left:-1px}
+.hero-grid b{display:block;font-family:var(--f-num);font-size:.95rem;font-weight:500}
+.status{margin-top:12px;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.15);font-size:.88rem}
+.split{height:12px;border-radius:6px;overflow:hidden;display:flex;background:rgba(255,255,255,.25);margin-top:10px}
+.split span{display:block;height:100%}
+label{display:block;font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+input,select{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 10px}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row3{display:grid;grid-template-columns:2fr 1fr;gap:10px}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:#fff;padding:9px 14px;font-weight:600}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) button{color:#0f1716}}
+:root[data-theme="dark"] button{color:#0f1716}
+button.ghost{background:transparent;color:var(--accent)}
+button.x{background:transparent;border:none;color:var(--muted);padding:4px 8px;font-size:1.1rem;line-height:1}
+.cats{display:flex;flex-direction:column;gap:14px}
+.cat-head{display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}
+.cat-name{font-weight:600}
+.cat-vals{font-size:.85rem;color:var(--muted)}
+.bar{position:relative;height:10px;border-radius:5px;background:var(--accent-soft);overflow:hidden;margin-top:6px;display:flex}
+.bar .real{background:var(--accent)}
+.bar .sim{background:repeating-linear-gradient(45deg,var(--sim) 0 4px,transparent 4px 7px);border:1px solid var(--sim)}
+.over .bar .real{background:var(--bad)}
+.pill{display:inline-block;font-size:.72rem;font-weight:600;padding:1px 8px;border-radius:999px;border:1px solid currentColor}
+.pill.ok{color:var(--save)} .pill.warn{color:var(--warn)} .pill.bad{color:var(--bad)} .pill.sim{color:var(--sim)}
+.tabs{display:flex;gap:6px;margin-bottom:12px}
+.tabs button{flex:1;background:transparent;color:var(--muted);border-color:var(--line)}
+.tabs button[aria-pressed="true"]{background:var(--accent-soft);color:var(--ink);border-color:var(--accent)}
+.form{display:flex;flex-direction:column;gap:10px}
+.list{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column}
+.list li{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}
+.list .t{min-width:0}
+.list .t div:first-child{overflow-wrap:anywhere}
+.list .meta{font-size:.78rem;color:var(--muted)}
+.list li.simrow .amt{color:var(--sim)}
+.impact{margin-top:10px;font-size:.9rem;padding:10px;border-radius:8px;background:var(--accent-soft)}
+.cfg-cats{display:flex;flex-direction:column;gap:8px}
+.cfg-cat{display:grid;grid-template-columns:1fr 130px auto;gap:6px;align-items:center}
+.note{font-size:.82rem;color:var(--muted)}
+.example{font-size:.78rem;color:var(--warn);font-weight:600}
+details summary{cursor:pointer;font-family:var(--f-display);font-weight:700;font-size:1.15rem}
+details[open] summary{margin-bottom:12px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+@media (max-width:420px){.hero-grid{grid-template-columns:1fr 1fr}.cfg-cat{grid-template-columns:1fr 110px auto}}
+@media (prefers-reduced-motion:no-preference){.bar span{transition:width .3s}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Mi Sueldo al Día</h1>
+    <p class="sub">Define tu ahorro, reparte el resto en categorías y mira cuánto te afecta cada gasto.</p>
+    <p class="example" id="exampleNote" hidden>Estás viendo datos de ejemplo. Cámbialos en “Configurar mes”.</p>
+  </header>
+
+  <section class="hero" aria-live="polite">
+    <div class="lbl">Te queda para gastar (dentro del tope)</div>
+    <div class="big" id="hDisp">$0</div>
+    <div class="hero-grid">
+      <div>Sueldo<b id="hSueldo">$0</b></div>
+      <div>Ahorro<b id="hAhorro">$0</b></div>
+      <div>Tope de gasto<b id="hTope">$0</b></div>
+      <div>Gastado<b id="hGast">$0</b></div>
+    </div>
+    <div class="split" id="hSplit" aria-hidden="true"></div>
+    <div class="status" id="hStatus"></div>
+  </section>
+
+  <section>
+    <h2>Presupuesto por categoría</h2>
+    <div class="cats" id="cats"></div>
+    <p class="note" style="margin:12px 0 0">Barra sólida: gasto real. Barra rayada: gasto simulado.</p>
+  </section>
+
+  <section>
+    <h2>Registrar</h2>
+    <div class="tabs" role="group" aria-label="Tipo de movimiento">
+      <button type="button" id="tReal" aria-pressed="true">Gasto real</button>
+      <button type="button" id="tSim" aria-pressed="false">¿Y si lo compro?</button>
+    </div>
+    <form class="form" id="fGasto">
+      <div><label for="gDesc">Descripción</label><input id="gDesc" required placeholder="Ej: Zapatillas, cuenta de luz"></div>
+      <div class="row">
+        <div><label for="gMonto">Monto (CLP)</label><input id="gMonto" inputmode="numeric" required placeholder="25.000"></div>
+        <div><label for="gCat">Categoría</label><select id="gCat"></select></div>
+      </div>
+      <div class="impact" id="preview" hidden></div>
+      <button type="submit" id="gBtn">Agregar gasto</button>
+    </form>
+    <ul class="list" id="list"></ul>
+  </section>
+
+  <section>
+    <details id="cfg">
+      <summary>Configurar mes</summary>
+      <div class="form">
+        <div><label for="cSueldo">Sueldo líquido</label><input id="cSueldo" inputmode="numeric"></div>
+        <div class="row">
+          <div><label for="cPct">% de ahorro</label><input id="cPct" type="number" min="0" max="90" step="1"></div>
+          <div><label for="cMax">% gasto máximo</label><input id="cMax" type="number" min="1" max="100" step="1"></div>
+        </div>
+        <p class="note" id="cfgPct"></p>
+        <div>
+          <label>Categorías y monto asignado</label>
+          <div class="cfg-cats" id="cfgCats"></div>
+          <p class="note" id="cfgSum"></p>
+        </div>
+        <div class="actions">
+          <button type="button" class="ghost" id="addCat">+ Categoría</button>
+          <button type="button" class="ghost" id="autoRep">Repartir lo disponible en partes iguales</button>
+        </div>
+        <div class="actions">
+          <button type="button" class="ghost" id="newMonth">Empezar mes nuevo (borra gastos)</button>
+          <button type="button" class="ghost" id="clearSim">Quitar simulaciones</button>
+        </div>
+        <p class="note">Tus datos se guardan solo en este navegador.</p>
+      </div>
+    </details>
+  </section>
+</div>
+
+<script>
+const KEY='mi-sueldo-al-dia-v1';
+const fmt=n=>(n<0?'-':'')+'$'+Math.round(Math.abs(n)).toLocaleString('es-CL');
+const parse=s=>Number(String(s).replace(/[^\d]/g,''))||0;
+const uid=()=>Math.random().toString(36).slice(2,9);
+
+const EXAMPLE={example:true,v:2,sueldo:550000,pct:10,maxPct:80,
+  cats:[{id:'c1',name:'Arriendo / dividendo',amt:220000},{id:'c2',name:'Supermercado',amt:100000},{id:'c3',name:'Transporte',amt:40000},
+        {id:'c4',name:'Cuentas básicas',amt:45000},{id:'c5',name:'Salidas y ocio',amt:35000}],
+  gastos:[{id:'g1',desc:'Arriendo octubre',amt:220000,cat:'c1',sim:false},{id:'g2',desc:'Compra semanal Líder',amt:38500,cat:'c2',sim:false},
+          {id:'g3',desc:'Carga Bip!',amt:15000,cat:'c3',sim:false},{id:'g4',desc:'Cuenta de luz',amt:24900,cat:'c4',sim:false},
+          {id:'g5',desc:'Zapatillas nuevas',amt:45000,cat:'c5',sim:true}]};
+
+let S;
+try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!S||!S.cats||(S.example&&S.v!==2))S=structuredClone(EXAMPLE);
+if(S.maxPct==null)S.maxPct=100-S.pct;
+let mode='real';
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const $=id=>document.getElementById(id);
+
+function totals(extra){
+  const ahorro=S.sueldo*S.pct/100, libre=S.sueldo-ahorro;
+  const tope=Math.min(S.sueldo*S.maxPct/100,libre), colchon=libre-tope, disp=tope;
+  let real=0,sim=0;
+  S.gastos.forEach(g=>g.sim?sim+=g.amt:real+=g.amt);
+  if(extra)sim+=extra;
+  const ah=g=>ahorro-Math.max(0,g-libre);
+  return {ahorro,tope,colchon,disp,real,sim,queda:disp-real,quedaSim:disp-real-sim,
+          ahorroReal:ah(real),ahorroSim:ah(real+sim),usoTope:tope?real/tope:0};
+}
+function byCat(id){let r=0,s=0;S.gastos.forEach(g=>{if(g.cat===id)g.sim?s+=g.amt:r+=g.amt});return{r,s}}
+
+function render(){
+  $('exampleNote').hidden=!S.example;
+  const t=totals();
+  $('hDisp').textContent=fmt(t.queda);
+  $('hSueldo').textContent=fmt(S.sueldo);
+  $('hAhorro').textContent=fmt(t.ahorro)+' ('+S.pct+'%)';
+  $('hGast').textContent=fmt(t.real);
+  const W=v=>Math.max(0,v/S.sueldo*100)+'%';
+  $('hSplit').innerHTML=`<i id="hMark" class="mark" title="Tope de gasto"></i><span style="width:${W(t.ahorro)};background:#9be3a6"></span><span style="width:${W(t.real)};background:#fff"></span><span style="width:${W(t.sim)};background:repeating-linear-gradient(45deg,#d7d0ff 0 4px,transparent 4px 7px)"></span>`;
+  $('hTope').textContent=fmt(t.tope)+' ('+S.maxPct+'%)';
+  $('hMark').style.left=Math.min(100,(t.ahorro+t.tope)/S.sueldo*100)+'%';
+  let st;
+  const gastoPct=Math.round(t.real/S.sueldo*100);
+  if(t.queda<0){
+    st=`Superaste tu tope de gasto (${S.maxPct}% del sueldo) por ${fmt(-t.queda)}. Llevas gastado el ${gastoPct}% del sueldo.`;
+    st+= t.ahorroReal<t.ahorro?` Ya estás usando tu ahorro: este mes ahorrarías ${fmt(Math.max(0,t.ahorroReal))}.`:t.colchon?` Lo estás cubriendo con el margen libre; tu ahorro sigue intacto.`:'';
+  } else st=`Vas bien: llevas el ${gastoPct}% del sueldo gastado (tope ${S.maxPct}%) y tu ahorro de ${fmt(t.ahorro)} está intacto.`;
+  if(t.sim>0) st+= t.quedaSim<0
+    ? ` Si haces las compras simuladas (${fmt(t.sim)}), te pasas del tope por ${fmt(-t.quedaSim)}${t.ahorroSim<t.ahorro?` y tu ahorro baja a ${fmt(Math.max(0,t.ahorroSim))}`:''}.`
+    : ` Con las compras simuladas (${fmt(t.sim)}) te quedarían ${fmt(t.quedaSim)} dentro del tope.`;
+  if(t.colchon>0) st+=` Margen libre fuera del tope: ${fmt(t.colchon)}.`;
+  $('hStatus').textContent=st;
+
+  // categorías
+  $('cats').innerHTML=S.cats.map(c=>{
+    const {r,s}=byCat(c.id), base=Math.max(c.amt,r+s,1);
+    const rest=c.amt-r, restSim=c.amt-r-s;
+    let pill;
+    if(rest<0)pill=`<span class="pill bad">Excedido ${fmt(-rest)}</span>`;
+    else if(restSim<0)pill=`<span class="pill sim">Simulación excede ${fmt(-restSim)}</span>`;
+    else if(c.amt && r/c.amt>=.8)pill=`<span class="pill warn">Quedan ${fmt(rest)}</span>`;
+    else pill=`<span class="pill ok">Quedan ${fmt(rest)}</span>`;
+    return `<div class="${rest<0?'over':''}"><div class="cat-head"><span class="cat-name">${esc(c.name)}</span>${pill}</div>
+      <div class="cat-vals num">${fmt(r)}${s?` + ${fmt(s)} sim.`:''} de ${fmt(c.amt)}</div>
+      <div class="bar" role="img" aria-label="${esc(c.name)}: gastado ${fmt(r)} de ${fmt(c.amt)}"><span class="real" style="width:${r/base*100}%"></span><span class="sim" style="width:${s/base*100}%"></span></div></div>`;
+  }).join('')||'<p class="note">Agrega categorías en “Configurar mes”.</p>';
+
+  // select
+  const cur=$('gCat').value;
+  $('gCat').innerHTML=S.cats.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  if(S.cats.some(c=>c.id===cur))$('gCat').value=cur;
+
+  // lista
+  $('list').innerHTML=S.gastos.slice().reverse().map(g=>{
+    const c=S.cats.find(x=>x.id===g.cat);
+    return `<li class="${g.sim?'simrow':''}"><div class="t"><div>${esc(g.desc)} ${g.sim?'<span class="pill sim">simulado</span>':''}</div>
+      <div class="meta">${c?esc(c.name):'Sin categoría'} · ${(g.amt/S.sueldo*100).toFixed(1)}% del sueldo</div></div>
+      <div class="amt num">${fmt(g.amt)}</div>
+      <div>${g.sim?`<button class="x" data-conf="${g.id}" title="Confirmar como gasto real" aria-label="Confirmar ${esc(g.desc)} como gasto real">✓</button>`:''}<button class="x" data-del="${g.id}" aria-label="Eliminar ${esc(g.desc)}">×</button></div></li>`;
+  }).join('');
+
+  renderCfg();
+  preview();
+}
+function esc(s){return String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+
+function renderCfg(){
+  if(document.activeElement && $('cfg').contains(document.activeElement))return updSum();
+  $('cSueldo').value=S.sueldo.toLocaleString('es-CL');
+  $('cPct').value=S.pct;
+  $('cMax').value=S.maxPct;
+  $('cfgCats').innerHTML=S.cats.map(c=>`<div class="cfg-cat" data-id="${c.id}">
+    <input id="cn-${c.id}" value="${esc(c.name)}" aria-label="Nombre de categoría">
+    <input id="ca-${c.id}" class="num" inputmode="numeric" value="${c.amt.toLocaleString('es-CL')}" aria-label="Monto de ${esc(c.name)}">
+    <button class="x" data-rmcat="${c.id}" aria-label="Quitar ${esc(c.name)}">×</button></div>`).join('');
+  updSum();
+}
+function updSum(){
+  const t=totals(), asign=S.cats.reduce((a,c)=>a+c.amt,0), dif=t.disp-asign;
+  $('cfgPct').innerHTML= S.pct+S.maxPct>100
+    ? `<span class="pill warn">Ahorro + tope suman ${S.pct+S.maxPct}%</span> El tope se ajusta a lo que queda después del ahorro: ${fmt(t.tope)}.`
+    : `Ahorro ${fmt(t.ahorro)} · Tope de gasto ${fmt(t.tope)} · Margen libre ${fmt(t.colchon)} (${100-S.pct-S.maxPct}%)`;
+  $('cfgSum').innerHTML=`Tope para repartir: <span class="num">${fmt(t.disp)}</span> · Asignado: <span class="num">${fmt(asign)}</span> · `+
+    (dif===0?'<span class="pill ok">Todo repartido</span>':dif>0?`<span class="pill warn">Sin asignar ${fmt(dif)}</span>`:`<span class="pill bad">Te pasas por ${fmt(-dif)}</span>`);
+}
+
+function preview(){
+  const amt=parse($('gMonto').value), p=$('preview');
+  if(!amt){p.hidden=true;return}
+  const c=S.cats.find(x=>x.id===$('gCat').value), {r,s}=c?byCat(c.id):{r:0,s:0};
+  const t=totals(), quedaDesp=t.queda-amt, catDesp=c?c.amt-r-(mode==='sim'?s:0)-amt:0;
+  let msg=`Es el <b>${(amt/S.sueldo*100).toFixed(1)}%</b> de tu sueldo. `;
+  if(c)msg+= catDesp>=0?`En ${esc(c.name)} te quedarían <b class="num">${fmt(catDesp)}</b>. `:`Te pasas de ${esc(c.name)} por <b class="num">${fmt(-catDesp)}</b>. `;
+  const gastoTot=t.real+(mode==='sim'?t.sim:0)+amt;
+  msg+=`Tu gasto llegaría al <b>${(gastoTot/S.sueldo*100).toFixed(0)}%</b> del sueldo (tope ${S.maxPct}%). `;
+  if(quedaDesp>=0) msg+=`Te quedarían <b class="num">${fmt(quedaDesp)}</b> dentro del tope.`;
+  else{const deAhorro=Math.max(0,-quedaDesp-t.colchon);
+    msg+=`Te pasarías del tope por <b class="num">${fmt(-quedaDesp)}</b>`+(deAhorro?`, y <b class="num">${fmt(Math.min(deAhorro,t.ahorro))}</b> saldrían de tu ahorro.`:`; lo cubre tu margen libre.`)}
+  p.innerHTML=msg;p.hidden=false;
+}
+
+function setMode(m){mode=m;$('tReal').setAttribute('aria-pressed',m==='real');$('tSim').setAttribute('aria-pressed',m==='sim');
+  $('gBtn').textContent=m==='real'?'Agregar gasto':'Simular compra';preview()}
+$('tReal').onclick=()=>setMode('real');$('tSim').onclick=()=>setMode('sim');
+$('gMonto').addEventListener('input',e=>{const v=parse(e.target.value);e.target.value=v?v.toLocaleString('es-CL'):'';preview()});
+$('gCat').onchange=preview;
+$('fGasto').addEventListener('submit',e=>{e.preventDefault();const amt=parse($('gMonto').value),d=$('gDesc').value.trim();
+  if(!amt||!d)return;S.example=false;S.gastos.push({id:uid(),desc:d,amt,cat:$('gCat').value,sim:mode==='sim'});
+  $('gDesc').value='';$('gMonto').value='';save();render()});
+$('list').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.del)S.gastos=S.gastos.filter(g=>g.id!==b.dataset.del);
+  if(b.dataset.conf)S.gastos.find(g=>g.id===b.dataset.conf).sim=false;
+  save();render()});
+
+// configuración
+$('cSueldo').addEventListener('input',e=>{S.sueldo=parse(e.target.value);e.target.value=S.sueldo?S.sueldo.toLocaleString('es-CL'):'';S.example=false;save();render()});
+$('cPct').addEventListener('input',e=>{S.pct=Math.min(90,Math.max(0,Number(e.target.value)||0));S.example=false;save();render()});
+$('cMax').addEventListener('input',e=>{S.maxPct=Math.min(100,Math.max(1,Number(e.target.value)||1));S.example=false;save();render()});
+$('cfgCats').addEventListener('input',e=>{const row=e.target.closest('.cfg-cat');if(!row)return;const c=S.cats.find(x=>x.id===row.dataset.id);
+  if(e.target.id.startsWith('cn-'))c.name=e.target.value;else{c.amt=parse(e.target.value);e.target.value=c.amt?c.amt.toLocaleString('es-CL'):''}
+  S.example=false;save();render()});
+$('cfgCats').addEventListener('click',e=>{const b=e.target.closest('[data-rmcat]');if(!b)return;
+  S.cats=S.cats.filter(c=>c.id!==b.dataset.rmcat);S.gastos.forEach(g=>{if(g.cat===b.dataset.rmcat)g.cat=null});save();$('addCat').focus();render()});
+$('addCat').onclick=()=>{S.cats.push({id:uid(),name:'Nueva categoría',amt:0});save();$('addCat').blur();render()};
+$('autoRep').onclick=()=>{const t=totals(),n=S.cats.length;if(!n)return;const each=Math.floor(t.disp/n);
+  S.cats.forEach((c,i)=>c.amt=i===n-1?t.disp-each*(n-1):each);save();$('autoRep').blur();render()};
+let armed=false;
+$('newMonth').onclick=e=>{if(!armed){armed=true;e.target.textContent='Toca de nuevo para confirmar';setTimeout(()=>{armed=false;e.target.textContent='Empezar mes nuevo (borra gastos)'},3000);return}
+  armed=false;S.gastos=[];S.example=false;e.target.textContent='Empezar mes nuevo (borra gastos)';save();e.target.blur();render()};
+$('clearSim').onclick=e=>{S.gastos=S.gastos.filter(g=>!g.sim);save();e.target.blur();render()};
+render();
+</script>
+
+</body></html>
