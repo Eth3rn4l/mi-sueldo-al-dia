@@ -2,7 +2,7 @@
 
 App web para organizar el sueldo del mes: defines cuánto ahorrar, un tope de gasto y montos por categoría, y ves en tiempo real cuánto te queda y cuánto te afectaría cada compra antes de hacerla.
 
-**[Probar la app](https://eth3rn4l.github.io/mi-sueldo-al-dia/)**
+**[Probar la app](https://dibahamondez.github.io/mi-sueldo-al-dia/)**
 
 <img src="docs/resumen.png" alt="Resumen del mes con presupuesto por categoría" width="320">
 
